@@ -22,8 +22,8 @@ func struct_a_bytes(p interface{}) []byte {
 }
 
 // Decodifica de [] Bytes a Struct
-func bytes_a_struct_mbr(s []byte) mbr {
-	p := mbr{}
+func bytes_a_struct_mbr(s []byte) Mbr {
+	p := Mbr{}
 	dec := gob.NewDecoder(bytes.NewReader(s))
 	err := dec.Decode(&p)
 
@@ -35,9 +35,9 @@ func bytes_a_struct_mbr(s []byte) mbr {
 	return p
 }
 
-func bytes_a_struct_ebr(s []byte) ebr {
+func bytes_a_struct_ebr(s []byte) Ebr {
 	// Descodificacion
-	p := ebr{}
+	p := Ebr{}
 	dec := gob.NewDecoder(bytes.NewReader(s))
 	err := dec.Decode(&p)
 

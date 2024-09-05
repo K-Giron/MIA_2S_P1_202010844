@@ -15,21 +15,23 @@ import (
 
 // estructura ---------------------------------------
 // Master Boot Record (MBR)
-type mbr = struct {
+type Mbr = struct {
 	Mbr_tamano         [100]byte
 	Mbr_fecha_creacion [100]byte
 	Mbr_dsk_signature  [100]byte
 	Dsk_fit            [100]byte
-	Mbr_partition      [4]partition
+	Mbr_partition      [4]Partition
 }
 
-type partition = struct {
-	Part_status [100]byte
-	Part_type   [100]byte
-	Part_fit    [100]byte
-	Part_start  [100]byte
-	Part_size   [100]byte
-	Part_name   [100]byte
+type Partition = struct {
+	Part_status      [100]byte
+	Part_type        [100]byte
+	Part_fit         [100]byte
+	Part_start       [100]byte
+	Part_size        [100]byte
+	Part_name        [100]byte
+	Part_correlative [100]byte
+	Part_id          [100]byte
 }
 
 /* MKDISK */
@@ -177,7 +179,7 @@ func Mkdisk(commandArray []string) {
 			// Verifico que el parametro "Size" (Obligatorio) este ingresado
 			if band_size {
 				total_size := 1024
-				master_boot_record := mbr{}
+				master_boot_record := Mbr{}
 
 				// Disco -> Archivo Binario
 				crear_disco(val_path)
@@ -232,6 +234,8 @@ func Mkdisk(commandArray []string) {
 					copy(master_boot_record.Mbr_partition[i].Part_start[:], "-1")
 					copy(master_boot_record.Mbr_partition[i].Part_size[:], "0")
 					copy(master_boot_record.Mbr_partition[i].Part_name[:], "")
+					copy(master_boot_record.Mbr_partition[i].Part_correlative[:], "0")
+					copy(master_boot_record.Mbr_partition[i].Part_id[:], "0")
 				}
 				// pasar de entero a string
 				// Convierto de entero a string

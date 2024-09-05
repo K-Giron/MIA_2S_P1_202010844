@@ -1,0 +1,30 @@
+
+mkdisk -size=5 -unit=M -path=C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia
+
+//fdisk (primaria)
+fdisk -Size=300 -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=Particion1
+
+//particion 2(extendida)
+fdisk -type=E -Size=300 -path=C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia -unit=K -name=Particion2
+
+//particion 3(logica)
+fdisk -type=l -Size=300 -fit=BF -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -unit=K -name=ParticionN
+
+//particion primaria 2
+fdisk -Size=300 -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=Particion3
+
+//particion pimaria 3
+fdisk -Size=300 -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=Particion4
+
+//paricion error
+fdisk -Size=300 -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=Particion5
+
+//montar particion 1
+mount -path=C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia -name=Particion1
+
+# REP
+# DISK
+rep -id=441A -Path=C:\Users\kevin\Desktop\P1_MIA\Reportes\Disk.jpg -name=disk
+
+rmdisk -path=C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia
+                                                                                       

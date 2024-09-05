@@ -88,11 +88,13 @@ func ejecutarComando(commandArray []string) {
 		Comandos.Fdisk(commandArray)
 	case "mount":
 		fmt.Println("MOUNT")
+		Comandos.Mount(commandArray)
 	case "umount":
 		fmt.Println("UMOUNT")
+		//Comandos.Mount(commandArray)
 	case "rep":
 		fmt.Println("REP")
-		Comandos.Rep()
+		Comandos.Rep(commandArray)
 	case "execute":
 		fmt.Println("EXEC")
 		Execute(commandArray)

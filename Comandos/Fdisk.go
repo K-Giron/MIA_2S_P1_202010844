@@ -10,7 +10,7 @@ import (
 )
 
 // estructura ---------------------------------------
-type ebr = struct {
+type Ebr = struct {
 	Part_status [100]byte
 	Part_fit    [100]byte
 	Part_start  [100]byte
@@ -225,7 +225,7 @@ func crear_particion_primaria(direccion string, nombre string, size int, fit str
 	aux_unit := ""
 	size_bytes := 1024
 
-	mbr_empty := mbr{}
+	mbr_empty := Mbr{}
 	var empty [100]byte
 
 	// Verifico si tiene Ajuste
@@ -657,8 +657,8 @@ func crear_particion_extendia(direccion string, nombre string, size int, fit str
 	aux_unit := ""
 	size_bytes := 1024
 
-	mbr_empty := mbr{}
-	ebr_empty := ebr{}
+	mbr_empty := Mbr{}
+	ebr_empty := Ebr{}
 	var empty [100]byte
 
 	// Verifico si tiene Ajuste
@@ -846,7 +846,7 @@ func crear_particion_extendia(direccion string, nombre string, size int, fit str
 								// Se posiciona en el inicio de la particion
 								f.Seek(int64(i_part_start), os.SEEK_SET)
 
-								extended_boot_record := ebr{}
+								extended_boot_record := Ebr{}
 								copy(extended_boot_record.Part_fit[:], aux_fit)
 								copy(extended_boot_record.Part_status[:], "0")
 								copy(extended_boot_record.Part_start[:], s_part_start)
@@ -972,7 +972,7 @@ func crear_particion_extendia(direccion string, nombre string, size int, fit str
 								// Se posiciona en el inicio de la particion
 								f.Seek(int64(i_part_start_best), os.SEEK_SET)
 
-								extended_boot_record := ebr{}
+								extended_boot_record := Ebr{}
 								copy(extended_boot_record.Part_fit[:], aux_fit)
 								copy(extended_boot_record.Part_status[:], "0")
 								copy(extended_boot_record.Part_start[:], s_part_start_best)
@@ -1098,7 +1098,7 @@ func crear_particion_extendia(direccion string, nombre string, size int, fit str
 								// Se posiciona en el inicio de la particion
 								f.Seek(int64(i_part_start_worst), os.SEEK_SET)
 
-								extended_boot_record := ebr{}
+								extended_boot_record := Ebr{}
 								copy(extended_boot_record.Part_fit[:], aux_fit)
 								copy(extended_boot_record.Part_status[:], "0")
 								copy(extended_boot_record.Part_start[:], s_part_start_worst)
@@ -1147,8 +1147,8 @@ func crear_particion_logica(direccion string, nombre string, size int, fit strin
 	aux_unit := ""
 	size_bytes := 1024
 
-	mbr_empty := mbr{}
-	ebr_empty := ebr{}
+	mbr_empty := Mbr{}
+	ebr_empty := Ebr{}
 	var empty [100]byte
 
 	// Verifico si tiene Ajuste
@@ -1303,8 +1303,8 @@ func crear_particion_logica(direccion string, nombre string, size int, fit strin
 // Verifica si el nombre de la particion esta disponible
 func existe_particion(direccion string, nombre string) bool {
 	extendida := -1
-	mbr_empty := mbr{}
-	ebr_empty := ebr{}
+	mbr_empty := Mbr{}
+	ebr_empty := Ebr{}
 	var empty [100]byte
 	cont := 0
 	fin_archivo := false
