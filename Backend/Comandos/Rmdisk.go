@@ -1,14 +1,13 @@
 package Comandos
 
 import (
-	"fmt"
 	"os"
 	"strings"
 )
 
 /*RMDISK*/
 func Rmdisk(commandArray []string) {
-	fmt.Println("[MENSAJE] El comando RMDISK aqui inicia")
+	Salida_comando += "MENSAJE: El comando RMDISK aqui inicia" + "\n"
 
 	// Variables para los valores de los parametros
 	val_path := ""
@@ -29,7 +28,7 @@ func Rmdisk(commandArray []string) {
 		case strings.Contains(data, "path="):
 			// Valido si el parametro ya fue ingresado
 			if band_path {
-				fmt.Println("[ERROR] El parametro -path ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -path ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -41,7 +40,7 @@ func Rmdisk(commandArray []string) {
 			val_path = strings.Replace(val_data, "\"", "", 2)
 		/* PARAMETRO NO VALIDO */
 		default:
-			fmt.Println("[ERROR] Parametro no valido...")
+			Salida_comando += "ERROR: Parametro no valido" + "\n"
 		}
 	}
 
@@ -54,39 +53,25 @@ func Rmdisk(commandArray []string) {
 
 			if e != nil {
 				if os.IsNotExist(e) {
-					fmt.Println("[ERROR] El archivo no existe...")
+					Salida_comando += "ERROR: El archivo no existe" + "\n"
 					band_path = false
 				}
 			} else {
-				// si existe el archivo
-				fmt.Println("[MENSAJE] ¿Desea eliminar el disco [S/N]?: ")
+				// Elimino el archivo
+				err := os.Remove(val_path)
 
-				// Obtengo la opcion ingresada por el usuario
-				var opcion string
-				fmt.Scanln(&opcion)
-
-				// verifico la opcion ingresada
-				if opcion == "S" || opcion == "s" {
-
-					// Elimino el archivo
-					err := os.Remove(val_path)
-
-					// ERROR
-					if err != nil {
-						MsgError(err)
-					} else {
-						fmt.Println("[SUCCES] El archivo fue eliminado!")
-					}
-
-					band_path = false
-				} else if opcion == "N" || opcion == "n" {
-					fmt.Println("[Mensaje] El archivo no fue eliminado!")
-					band_path = false
+				// ERROR
+				if err != nil {
+					Salida_comando += "ERROR Al eliminar el archivo" + "\n"
+					MsgError(err)
 				} else {
-					fmt.Println("[ERROR] Opcion no valida...")
+					Salida_comando += "MENSAJE: El archivo fue eliminado" + "\n"
 				}
+				band_path = false
 			}
+		} else {
+			Salida_comando += "ERROR: El parametro -path es obligatorio" + "\n"
 		}
 	}
-	fmt.Println("[MENSAJE] El comando RMDISK aqui finaliza")
+	Salida_comando += "MENSAJE: El comando RMDISK termina aqui" + "\n"
 }

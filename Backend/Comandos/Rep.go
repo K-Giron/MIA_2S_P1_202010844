@@ -15,7 +15,7 @@ var graphDot = ""
 
 // Muestra los datos en el disco
 func Rep(commandArray []string) {
-	fmt.Println("[MENSAJE] El comando REP aqui inicia")
+	Salida_comando += "MENSAJE: El comando REP aqui inicia" + "\n"
 	// Variables para los valores de los parametros
 	val_name := ""
 	val_path := ""
@@ -43,7 +43,7 @@ func Rep(commandArray []string) {
 		case strings.Contains(data, "name="):
 			// Valido si el parametro ya fue ingresado
 			if band_name {
-				fmt.Println("[ERROR] El parametro -name ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -name ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -56,7 +56,7 @@ func Rep(commandArray []string) {
 		/* PARAMETRO OBLIGATORIO -> PATH */
 		case strings.Contains(data, "path="):
 			if band_path {
-				fmt.Println("[ERROR] El parametro -path ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -path ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -70,7 +70,7 @@ func Rep(commandArray []string) {
 		case strings.Contains(data, "id="):
 			// Valido si el parametro ya fue ingresado
 			if band_id {
-				fmt.Println("[ERROR] El parametro -id ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -id ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -83,7 +83,7 @@ func Rep(commandArray []string) {
 		/* PARAMETRO OBLIGATORIO -> RUTA */
 		case strings.Contains(data, "ruta="):
 			if band_ruta {
-				fmt.Println("[ERROR] El parametro -ruta ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -ruta ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -92,7 +92,7 @@ func Rep(commandArray []string) {
 			band_ruta = true
 		/* PARAMETRO NO VALIDO */
 		default:
-			fmt.Println("[ERROR] Parametro no valido...")
+			Salida_comando += "ERROR: Parametro no valido..." + "\n"
 		}
 	}
 
@@ -114,19 +114,19 @@ func Rep(commandArray []string) {
 							graficar_disk(aux.Direccion, val_path)
 						}
 					} else {
-						fmt.Println("[ERROR] No se encontro la particion montada con el id:", val_id)
+						Salida_comando += "ERROR: No se encontro la particion montada con el id: " + val_id + "\n"
 					}
 				} else {
-					fmt.Println("[ERROR] El parametro -id no fue ingresado...")
+					Salida_comando += "ERROR: El parametro -id no fue ingresado..." + "\n"
 				}
 			} else {
-				fmt.Println("[ERROR] El parametro -name no fue ingresado...")
+				Salida_comando += "ERROR: El parametro -name no fue ingresado..." + "\n"
 			}
 		} else {
-			fmt.Println("[ERROR] El parametro -path no fue ingresado...")
+			Salida_comando += "ERROR: El parametro -path no fue ingresado..." + "\n"
 		}
 	}
-	fmt.Println("[MENSAJE] El comando REP aqui finaliza")
+	Salida_comando += "MENSAJE: El comando REP aqui finaliza" + "\n"
 }
 
 // Reporte DISK
@@ -483,6 +483,7 @@ func graficar_disk(direccion string, destino string) {
 
 			// Escribe el contenido en un archivo
 			err := ioutil.WriteFile("reporte.dot", []byte(graphDot), 0644)
+			Salida_comando += "MENSAJE: Generando reporte..." + "\n"
 			fmt.Println("[MENSAJE] Generando reporte...")
 			if err != nil {
 				fmt.Println("[ERROR] Error al escribir en el archivo:", err)
@@ -492,13 +493,14 @@ func graficar_disk(direccion string, destino string) {
 			// Ejecutar el comando para generar la imagen
 			cmd := exec.Command("dot", "-Tpng", "reporte.dot", "-o", destino)
 			if err := cmd.Run(); err != nil {
+				Salida_comando += "ERROR: Error al generar la imagen..." + "\n"
 				fmt.Println("[ERROR] Error al generar la imagen:", err)
 				return
 			}
 		} else {
-			fmt.Println("[ERROR] El disco no fue encontrado...")
+			Salida_comando += "ERROR: El disco no fue encontrado..." + "\n"
 		}
 	} else {
-		fmt.Println("[ERROR] Disco vacio...")
+		Salida_comando += "ERROR: Disco vacio..." + "\n"
 	}
 }

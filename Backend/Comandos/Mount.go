@@ -18,10 +18,11 @@ type ParticionMontada struct {
 	Nombre    string
 	Letra     string
 	Num       int
+	Estado    int // 0 = desmontada, 1 = montada
 }
 
 func Mount(commandArray []string) {
-	fmt.Println("MENSAJE: El comando MOUNT aqui inicia")
+	Salida_comando += "MENSAJE: El comando MOUNT aqui inicia" + "\n"
 	// Variables para los valores de los parametros
 	val_path := ""
 	val_name := ""
@@ -42,7 +43,7 @@ func Mount(commandArray []string) {
 		/* PARAMETRO OBLIGATORIO -> PATH */
 		case strings.Contains(data, "path="):
 			if band_path {
-				fmt.Println("[ERROR] El parametro -path ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -path ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -56,7 +57,7 @@ func Mount(commandArray []string) {
 		case strings.Contains(data, "name="):
 			// Valido si el parametro ya fue ingresado
 			if band_name {
-				fmt.Println("[ERROR] El parametro -name ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -name ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -68,7 +69,7 @@ func Mount(commandArray []string) {
 			val_name = strings.Replace(val_data, "\"", "", 2)
 		/* PARAMETRO NO VALIDO */
 		default:
-			fmt.Println("[ERROR] Parametro no valido...")
+			Salida_comando += "ERROR: Parametro no valido" + "\n"
 		}
 	}
 
@@ -82,7 +83,7 @@ func Mount(commandArray []string) {
 
 				if err == nil {
 					if buscarParticionM(val_path, val_name, ParticionesMontadas[:]) {
-						fmt.Println("Particion ya montada")
+						Salida_comando += "Particion ya montada" + "\n"
 					} else {
 						mbr_empty := Mbr{}
 
@@ -122,18 +123,18 @@ func Mount(commandArray []string) {
 						f.Close()
 
 						//guardar particion montada
-						ParticionesMontadas = append(ParticionesMontadas, ParticionMontada{id, val_path, val_name, letra, num})
-						fmt.Println("Particion montada con exito")
+						ParticionesMontadas = append(ParticionesMontadas, ParticionMontada{id, val_path, val_name, letra, num, 1})
+						Salida_comando += "Particion ya montada " + "\n"
 						//imprimir particiones montadas
 						for i := 0; i < len(ParticionesMontadas); i++ {
 							if ParticionesMontadas[i].Direccion != "" {
-								fmt.Println(ParticionesMontadas[i])
+								Salida_comando += fmt.Sprint(ParticionesMontadas[i]) + "\n"
 							}
 						}
 					}
 
 				} else {
-					fmt.Println("[Error] no se encuentra el disco")
+					Salida_comando += "[Error] no se encuentra el disco" + "\n"
 				}
 			} else {
 				// Buscar en las particiones logicas
@@ -168,7 +169,7 @@ func Mount(commandArray []string) {
 						f.Close()
 
 						if buscarParticionM(val_path, val_name, ParticionesMontadas[:]) {
-							fmt.Println("Particion ya montada")
+							Salida_comando += "Particion ya montada" + "\n"
 						} else {
 							//generar id
 							num := buscarNumero(val_path, ParticionesMontadas[:])
@@ -176,29 +177,29 @@ func Mount(commandArray []string) {
 							id := "44" + strconv.Itoa(num) + letra
 
 							//guardar particion montada
-							ParticionesMontadas[num] = ParticionMontada{id, val_path, val_name, letra, num}
-							fmt.Println("Particion montada con exito logica")
+							ParticionesMontadas[num] = ParticionMontada{id, val_path, val_name, letra, num, 1}
+							Salida_comando += "Particion logica montada con exito" + "\n"
 							//imprimir particiones montadas
 							for i := 0; i < len(ParticionesMontadas); i++ {
 								if ParticionesMontadas[i].Direccion != "" {
-									fmt.Println(ParticionesMontadas[i])
+									Salida_comando += fmt.Sprint(ParticionesMontadas[i]) + "\n"
 								}
 							}
 						}
 
 					} else {
-						fmt.Println("[Error] no se encuentra el disco")
+						Salida_comando += "[Error] no se encuentra el disco" + "\n"
 					}
 				} else {
-					fmt.Println("[Error] no se encuentra la particion a montar")
+					Salida_comando += "No se encuentra la particion a montar" + "\n"
 				}
 			}
 
 		} else {
-			fmt.Println("[ERROR] Faltan parametros obligatorios...")
+			Salida_comando += "ERROR: Faltan parametros obligatorios" + "\n"
 		}
 	}
-	fmt.Println("MENSAJE: El comando MOUNT aqui finaliza")
+	Salida_comando += "MENSAJE: El comando MOUNT aqui termina" + "\n"
 }
 
 func buscarParticionM(direccion string, nombre string, lista []ParticionMontada) bool {
@@ -358,3 +359,62 @@ func buscar_particion_l(direccion string, nombre string) int {
 
 	return -1
 }
+
+/*
+func GetMount(op string, id string, p *string) Partition {
+	if !(id[0] == '4' && id[1] == '4') {
+		Error(op, "El primer identificador no es válido.")
+		return Partition{}
+	}
+	//letra := id[len(id)-1]
+	id = strings.ReplaceAll(id, "44", "")
+	i, _ := strconv.Atoi(string(id[0] - 1))
+	if i < 0 {
+		Error(op, "El primer identificador no es válido.")
+		return Partition{}
+	}
+	for j := 10; j < 26; j++ {
+		if ParticionesMontadas[i].Estado == 1 {
+			//comparar letra
+			if ParticionesMontadas[i].Letra == string(rune(j)) {
+
+				path := ""
+				for k := 0; k < len(ParticionesMontadas[i].Direccion); k++ {
+					if ParticionesMontadas[i].Direccion[k] != 0 {
+						path += string(ParticionesMontadas[i].Direccion[k])
+					}
+				}
+
+				file, error := os.Open(strings.ReplaceAll(path, "\"", ""))
+				if error != nil {
+					Error(op, "Error al abrir el archivo")
+					return Partition{}
+				}
+				disk := NewMbr()
+				file.Seek(0, 0)
+
+				data := make([]byte, int(unsafe.Sizeof(disk)))
+				buffer := bytes.NewBuffer(data)
+				err_ := binary.Read(buffer, binary.BigEndian, &disk)
+
+				if err_ != nil {
+					Error("FDSIK", "Error al leer el archivo")
+					return Partition{}
+				}
+				file.Close()
+
+				nombreParticion := ""
+				for k := 0; k < len(ParticionesMontadas[i].Nombre); k++ {
+					if ParticionesMontadas[i].Nombre[k] != 0 {
+						nombreParticion += string(ParticionesMontadas[i].Nombre[k])
+					}
+				}
+				*p = path
+				return *BuscarParticiones(disk, nombreParticion, path)
+
+			}
+		}
+	}
+	return Partition{}
+}
+*/

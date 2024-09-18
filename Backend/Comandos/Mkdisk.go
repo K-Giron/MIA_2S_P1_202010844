@@ -2,7 +2,6 @@ package Comandos
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -34,6 +33,11 @@ type Partition = struct {
 	Part_id          [100]byte
 }
 
+func NewMbr() Mbr {
+	var mbr Mbr
+	return mbr
+}
+
 /* MKDISK */
 func Mkdisk(commandArray []string) {
 	//parametros obligatorios
@@ -42,7 +46,7 @@ func Mkdisk(commandArray []string) {
 	//unit
 	//fit
 
-	fmt.Println("MENSAJE: El comando MKDISK aqui inicia")
+	Salida_comando += "MENSAJE: El comando MKDISK aqui inicia" + "\n"
 
 	// Variables para los valores de los parametros
 	val_size := 0
@@ -69,7 +73,7 @@ func Mkdisk(commandArray []string) {
 		case strings.Contains(data, "size="):
 			// Valido si el parametro ya fue ingresado
 			if band_size {
-				fmt.Println("ERROR: El parametro -size ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -size ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -89,14 +93,14 @@ func Mkdisk(commandArray []string) {
 			// Valido que el tamaño sea positivo
 			if val_size < 0 {
 				band_error = true
-				fmt.Println("ERROR: El parametro -size es negativo...")
+				Salida_comando += "ERROR: El valor del parametro -size no es valido..." + "\n"
 				break
 			}
 		/* PARAMETRO OPCIONAL -> FIT */
 		case strings.Contains(data, "fit="):
 			// Valido si el parametro ya fue ingresado
 			if band_fit {
-				fmt.Println("ERROR: El parametro -fit ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -fit ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -118,7 +122,7 @@ func Mkdisk(commandArray []string) {
 				band_fit = true
 				val_fit = "w"
 			} else {
-				fmt.Println("ERROR: El Valor del parametro -fit no es valido...")
+				Salida_comando += "ERROR: El valor del parametro -fit no es valido..." + "\n"
 				band_error = true
 				break
 			}
@@ -126,7 +130,7 @@ func Mkdisk(commandArray []string) {
 		case strings.Contains(data, "unit="):
 			// Valido si el parametro ya fue ingresado
 			if band_unit {
-				fmt.Println("ERROR: El parametro -unit ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -unit ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -141,7 +145,7 @@ func Mkdisk(commandArray []string) {
 				band_unit = true
 			} else {
 				// Parametro no valido
-				fmt.Println("ERROR: El Valor del parametro -unit no es valido...")
+				Salida_comando += "ERROR: El valor del parametro -unit no es valido..." + "\n"
 				band_error = true
 				break
 			}
@@ -150,7 +154,7 @@ func Mkdisk(commandArray []string) {
 		case strings.Contains(data, "path="):
 			// Valido si el parametro ya fue ingresado
 			if band_path {
-				fmt.Println("ERROR: El parametro -path ya fue ingresado...")
+				Salida_comando += "ERROR: El parametro -path ya fue ingresado..." + "\n"
 				band_error = true
 				break
 			}
@@ -162,13 +166,13 @@ func Mkdisk(commandArray []string) {
 			val_path = strings.Replace(val_data, "\"", "", 2)
 			//verifico que el archivo tenga la extension .mia
 			if !strings.Contains(val_path, ".mia") {
-				fmt.Println("ERROR: El archivo no tiene la extension .mia...")
+				Salida_comando += "ERROR: El archivo no tiene la extension correcta..." + "\n"
 				band_error = true
 				break
 			}
 		/* PARAMETRO NO VALIDO */
 		default:
-			fmt.Println("ERROR: Parametro no valido...")
+			Salida_comando += "ERROR: Parametro no valido..." + "\n"
 		}
 	}
 
@@ -276,7 +280,7 @@ func Mkdisk(commandArray []string) {
 				if err != nil {
 					MsgError(err)
 				}
-				fmt.Println("MENSAJE: El disco se creo correctamente...")
+				Salida_comando += "Se creo el disco correctamente..." + "\n"
 				err = disco.Close()
 				if err != nil {
 					return
@@ -284,13 +288,12 @@ func Mkdisk(commandArray []string) {
 			}
 		}
 	}
-
-	fmt.Println("MENSAJE: El comando MKDISK aqui finaliza")
+	Salida_comando += "MENSAJE: El comando MKDISK aqui termina" + "\n"
 }
 
 func crear_disco(ruta string) {
 	aux, err := filepath.Abs(ruta)
-	fmt.Println("La ruta es:", aux)
+	Salida_comando += "Creando disco en la ruta: " + aux + "\n"
 
 	// ERROR
 	if err != nil {
@@ -302,7 +305,7 @@ func crear_disco(ruta string) {
 	if err != nil {
 		MsgError(err)
 	}
-	fmt.Println("Se creó el directorio...")
+	Salida_comando += "Directorio creado correctamente..." + "\n"
 
 	// Cambia los permisos del directorio
 	err = os.Chmod(filepath.Dir(aux), 0777)
@@ -313,7 +316,7 @@ func crear_disco(ruta string) {
 	// Verifica si existe la ruta para el archivo
 	if _, err := os.Stat(filepath.Dir(aux)); errors.Is(err, os.ErrNotExist) {
 		if err != nil {
-			fmt.Println("FAILURE: No se pudo crear el disco...")
+			Salida_comando += "ERROR: No se pudo crear el disco..." + "\n"
 		}
 	}
 }

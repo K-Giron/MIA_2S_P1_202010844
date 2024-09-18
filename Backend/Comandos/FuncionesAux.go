@@ -3,8 +3,8 @@ package Comandos
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
 	"io"
+	"strings"
 )
 
 // Codifica de Struct a []Bytes
@@ -51,5 +51,16 @@ func bytes_a_struct_ebr(s []byte) Ebr {
 
 // Muestra el mensaje de error
 func MsgError(err error) {
-	fmt.Println("[ERROR] ", err)
+	Salida_comando = "ERROR: " + err.Error()
+}
+
+func Error(op string, mensaje string) {
+	Salida_comando = "ERROR: " + op + "\nTIPO: " + mensaje
+}
+
+func Comparar(a string, b string) bool {
+	if strings.ToUpper(a) == strings.ToUpper(b) {
+		return true
+	}
+	return false
 }
