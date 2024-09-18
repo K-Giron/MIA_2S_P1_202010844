@@ -2,6 +2,7 @@ package Comandos
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -73,7 +74,7 @@ func Mkdisk(commandArray []string) {
 		case strings.Contains(data, "size="):
 			// Valido si el parametro ya fue ingresado
 			if band_size {
-				Salida_comando += "ERROR: El parametro -size ya fue ingresado..." + "\n"
+				fmt.Print("Invalido: El parametro -size ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -93,14 +94,14 @@ func Mkdisk(commandArray []string) {
 			// Valido que el tamaño sea positivo
 			if val_size < 0 {
 				band_error = true
-				Salida_comando += "ERROR: El valor del parametro -size no es valido..." + "\n"
+				fmt.Println("Invalido: El valor del parametro -size no es valido...")
 				break
 			}
 		/* PARAMETRO OPCIONAL -> FIT */
 		case strings.Contains(data, "fit="):
 			// Valido si el parametro ya fue ingresado
 			if band_fit {
-				Salida_comando += "ERROR: El parametro -fit ya fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -fit ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -122,7 +123,7 @@ func Mkdisk(commandArray []string) {
 				band_fit = true
 				val_fit = "w"
 			} else {
-				Salida_comando += "ERROR: El valor del parametro -fit no es valido..." + "\n"
+				fmt.Println("Invalido: El valor del parametro -fit no es valido...")
 				band_error = true
 				break
 			}
@@ -130,7 +131,7 @@ func Mkdisk(commandArray []string) {
 		case strings.Contains(data, "unit="):
 			// Valido si el parametro ya fue ingresado
 			if band_unit {
-				Salida_comando += "ERROR: El parametro -unit ya fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -unit ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -145,7 +146,7 @@ func Mkdisk(commandArray []string) {
 				band_unit = true
 			} else {
 				// Parametro no valido
-				Salida_comando += "ERROR: El valor del parametro -unit no es valido..." + "\n"
+				fmt.Println("Invalido: El valor del parametro -unit no es valido...")
 				band_error = true
 				break
 			}
@@ -154,7 +155,7 @@ func Mkdisk(commandArray []string) {
 		case strings.Contains(data, "path="):
 			// Valido si el parametro ya fue ingresado
 			if band_path {
-				Salida_comando += "ERROR: El parametro -path ya fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -path ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -166,13 +167,13 @@ func Mkdisk(commandArray []string) {
 			val_path = strings.Replace(val_data, "\"", "", 2)
 			//verifico que el archivo tenga la extension .mia
 			if !strings.Contains(val_path, ".mia") {
-				Salida_comando += "ERROR: El archivo no tiene la extension correcta..." + "\n"
+				fmt.Println("Invalido: El archivo no tiene la extension correcta...")
 				band_error = true
 				break
 			}
 		/* PARAMETRO NO VALIDO */
 		default:
-			Salida_comando += "ERROR: Parametro no valido..." + "\n"
+			fmt.Println("Invalido: El parametro " + data + " no es valido...")
 		}
 	}
 
@@ -316,7 +317,7 @@ func crear_disco(ruta string) {
 	// Verifica si existe la ruta para el archivo
 	if _, err := os.Stat(filepath.Dir(aux)); errors.Is(err, os.ErrNotExist) {
 		if err != nil {
-			Salida_comando += "ERROR: No se pudo crear el disco..." + "\n"
+			fmt.Println("Invalido: ", err)
 		}
 	}
 }

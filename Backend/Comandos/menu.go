@@ -4,13 +4,12 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/rs/cors"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
-
-	"github.com/rs/cors"
 )
 
 /* Ejemplo 7 */
@@ -26,32 +25,30 @@ var GraphDot string = ""
 
 // Obtiene y lee el comando
 func Analizar() {
-	fmt.Println("Bienvenido al API del Ejemplo 7")
+	fmt.Println("Bienvenido al proyecto 1")
 
 	mux := http.NewServeMux()
 
-	/* Ejemplo 7 */
-	// Endpoint tipo POST
 	mux.HandleFunc("/analizar", func(w http.ResponseWriter, r *http.Request) {
-		// Configuracion de la cabecera
+		// Configuración de la cabecera
 		w.Header().Set("Content-Type", "application/json")
+
 		var Content Cmd_API
 		body, _ := io.ReadAll(r.Body)
-		// Arreglo  de bytes a Json
+
+		// Deserializar JSON a struct
 		json.Unmarshal(body, &Content)
-		// Ejecuta el comando
+
+		// Ejecuta el comando y captura la salida
 		split_cmd(Content.Cmd)
-		//imprimir la salida de los comandos
-		fmt.Println(Salida_comando)
-		// Respuesta del servidor
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"result": "` + Salida_comando + `" }`))
-		// Limpio la salida de comandos
-		Salida_comando = ""
+
+		// Respuesta del servidor con la salida del comando
+		response := `{"result": "` + Salida_comando + `" }`
+		w.Write([]byte(response))
 	})
 
 	fmt.Println("Servidor en el puerto 5000")
-	// Configuracion de cors
+	// Configuración de CORS
 	handler := cors.Default().Handler(mux)
 	log.Fatal(http.ListenAndServe(":5000", handler))
 }
@@ -64,7 +61,7 @@ func split_cmd(cmd string) {
 	for i := 0; i < len(arr_com); i++ {
 		if arr_com[i] != "" {
 			SplitComando(arr_com[i])
-			Salida_comando += "\\n"
+			Salida_comando += "\n"
 		}
 	}
 }
@@ -85,7 +82,7 @@ func SplitComando(comando string) {
 	} else if strings.Contains(comando, "#") {
 		// Comentario
 		bandComentario = true
-		Salida_comando += comando + "\\n"
+		Salida_comando += comando + "\n"
 	} else {
 		// Comando con Parametros
 		commandArray = strings.Split(comando, " -")
@@ -105,46 +102,42 @@ func ejecutarComando(commandArray []string) {
 	// Identifica el comando a ejecutar
 	switch data {
 	case "mkdisk":
-		Salida_comando += "---------------------MKDISK--------------------" + "\\n"
+		Salida_comando += "---------------------MKDISK--------------------" + "\n"
 		Mkdisk(commandArray)
 	case "rmdisk":
-		Salida_comando += "---------------------RMDISK--------------------" + "\\n"
+		Salida_comando += "---------------------RMDISK--------------------" + "\n"
 		Rmdisk(commandArray)
 	case "fdisk":
-		Salida_comando += "---------------------FDISK--------------------" + "\\n"
+		Salida_comando += "---------------------FDISK--------------------" + "\n"
 		Fdisk(commandArray)
 	case "mount":
-		Salida_comando += "---------------------MOUNT--------------------" + "\\n"
+		Salida_comando += "---------------------MOUNT--------------------" + "\n"
 		Mount(commandArray)
-	case "umount":
-		Salida_comando += "---------------------UMOUNT--------------------" + "\\n"
-		//Mount(commandArray)
 	case "rep":
-		Salida_comando += "---------------------REP--------------------" + "\\n"
+		Salida_comando += "---------------------REP--------------------" + "\n"
 		Rep(commandArray)
 	case "mkfs":
-		Salida_comando += "---------------------MKFS--------------------" + "\\n"
+		Salida_comando += "---------------------MKFS--------------------" + "\n"
 		ValidarDatosMkfs(commandArray)
 	case "execute":
-		Salida_comando += "---------------------EXECUTE--------------------" + "\\n"
+		Salida_comando += "---------------------EXECUTE--------------------" + "\n"
 		Execute(commandArray)
 	case "pause":
-		Salida_comando += "---------------------PAUSE--------------------" + "\\n"
+		Salida_comando += "---------------------PAUSE--------------------" + "\n"
 	default:
-		Salida_comando += "ERROR: Comando no valido" + "\\n"
-
+		fmt.Println("Comandooo no valido")
 	}
 }
 
 /* EXECUTE */
 func Execute(commandArray []string) {
-	Salida_comando += "MENSAJE: El comando EXECUTE aqui inicia" + "\\n"
+	Salida_comando += "MENSAJE: El comando EXECUTE aqui inicia" + "\n"
 	//variable para el path
 	var path = ""
 
 	//verificar que el comando traiga parametros sino mandar error
 	if len(commandArray) == 1 {
-		Salida_comando += "ERROR: El comando no trae parametros" + "\\n"
+		fmt.Println("Invalido: El comando EXECUTE no tiene parametros")
 		return
 	}
 
@@ -162,12 +155,12 @@ func Execute(commandArray []string) {
 			path = strings.Replace(val_data, "\"", "", 2)
 		/* PARAMETRO NO VALIDO */
 		default:
-			Salida_comando += "ERROR: Parametro no valido" + "\\n"
+			fmt.Println("Invalido: El parametro " + data + " no es valido")
 		}
 	}
 	//verificar que el path tenga la extension correcta
 	if !strings.Contains(path, ".mia") {
-		Salida_comando += "ERROR: El archivo no tiene la extension correcta" + "\\n"
+		fmt.Println("Invalido: El archivo no tiene la extension correcta")
 		return
 	}
 	//abrir el archivo
@@ -175,7 +168,7 @@ func Execute(commandArray []string) {
 
 	//lee el archivo linea por linea y ejecuta los comandos
 	if err != nil {
-		Salida_comando += "ERROR: No se pudo abrir el archivo" + "\\n"
+		fmt.Println("Invalido: No se pudo abrir el archivo")
 		MsgError(err)
 	}
 	scanner := bufio.NewScanner(disco)
@@ -188,5 +181,5 @@ func Execute(commandArray []string) {
 		SplitComando(linea)
 	}
 	disco.Close()
-	Salida_comando += "MENSAJE: El comando EXECUTE aqui termina" + "\\n"
+	Salida_comando += "MENSAJE: El comando EXECUTE aqui termina" + "\n"
 }

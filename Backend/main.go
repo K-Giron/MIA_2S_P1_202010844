@@ -9,5 +9,6 @@ func main() {
 
 	fmt.Print("Iniciando el repositorio de Go")
 	Comandos.Analizar()
+	print(Comandos.Salida_comando)
 
 }

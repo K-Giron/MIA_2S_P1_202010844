@@ -1,23 +1,18 @@
-
 rmdisk -path=C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia
-
 mkdisk -size=5 -unit=M -path=C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia
-
-# FDISK
-# Particion 1 (Primaria)
 fdisk -Size=1 -unit=M -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=Particion1
-# Particion 1 (Primaria)
 fdisk -Size=1 -unit=M -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=Particion2
-# Particion 3 (Primaria)
 fdisk -Size=1 -unit=M -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=Particion3
-# Particion 4 (Primaria)
 fdisk -Size=2 -unit=M -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=Particion4
-
-//montar particion 1
 mount -path=C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia -name=Particion1
-
-# REP
-# DISK
 rep -id=441A -Path=C:\Users\kevin\Desktop\P1_MIA\Reportes\Disk.jpg -name=disk
 
-                                                                                       
+#para linux
+rmdisk -path=/home/kevin/Escritorio/archivos/MIA_2S_P1_202010844/Discos/A.mia
+mkdisk -size=5 -unit=M -path=/home/kevin/Escritorio/archivos/MIA_2S_P1_202010844/Discos/A.mia
+fdisk -Size=1 -unit=M -path="/home/kevin/Escritorio/archivos/MIA_2S_P1_202010844/Discos/A.mia" -name=Particion1
+fdisk -Size=1 -unit=M -path="/home/kevin/Escritorio/archivos/MIA_2S_P1_202010844/Discos/A.mia" -name=Particion2
+fdisk -Size=1 -unit=M -path="/home/kevin/Escritorio/archivos/MIA_2S_P1_202010844/Discos/A.mia" -name=Particion3
+fdisk -Size=2 -unit=M -path="/home/kevin/Escritorio/archivos/MIA_2S_P1_202010844/Discos/A.mia" -name=Particion4
+mount -path=/home/kevin/Escritorio/archivos/MIA_2S_P1_202010844/Discos/A.mia -name=Particion1
+rep -id=441A -Path=/home/kevin/Escritorio/archivos/MIA_2S_P1_202010844/Reportes/Disk.jpg -name=disk

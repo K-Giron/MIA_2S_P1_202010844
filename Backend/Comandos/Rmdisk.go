@@ -1,6 +1,7 @@
 package Comandos
 
 import (
+	"fmt"
 	"os"
 	"strings"
 )
@@ -28,7 +29,7 @@ func Rmdisk(commandArray []string) {
 		case strings.Contains(data, "path="):
 			// Valido si el parametro ya fue ingresado
 			if band_path {
-				Salida_comando += "ERROR: El parametro -path ya fue ingresado..." + "\n"
+				fmt.Print("Invalido: El parametro -path ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -40,7 +41,7 @@ func Rmdisk(commandArray []string) {
 			val_path = strings.Replace(val_data, "\"", "", 2)
 		/* PARAMETRO NO VALIDO */
 		default:
-			Salida_comando += "ERROR: Parametro no valido" + "\n"
+			fmt.Println("Invalido: El parametro " + data + " no es valido")
 		}
 	}
 
@@ -53,7 +54,7 @@ func Rmdisk(commandArray []string) {
 
 			if e != nil {
 				if os.IsNotExist(e) {
-					Salida_comando += "ERROR: El archivo no existe" + "\n"
+					fmt.Print("Invalido: El archivo no existe")
 					band_path = false
 				}
 			} else {
@@ -70,7 +71,7 @@ func Rmdisk(commandArray []string) {
 				band_path = false
 			}
 		} else {
-			Salida_comando += "ERROR: El parametro -path es obligatorio" + "\n"
+			fmt.Print("Invalido: El parametro -path es obligatorio")
 		}
 	}
 	Salida_comando += "MENSAJE: El comando RMDISK termina aqui" + "\n"

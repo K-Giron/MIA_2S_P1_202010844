@@ -26,7 +26,6 @@ func Mount(commandArray []string) {
 	// Variables para los valores de los parametros
 	val_path := ""
 	val_name := ""
-
 	// Banderas para verificar los parametros y ver si se repiten
 	band_path := false
 	band_name := false
@@ -43,7 +42,7 @@ func Mount(commandArray []string) {
 		/* PARAMETRO OBLIGATORIO -> PATH */
 		case strings.Contains(data, "path="):
 			if band_path {
-				Salida_comando += "ERROR: El parametro -path ya fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -path ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -57,7 +56,7 @@ func Mount(commandArray []string) {
 		case strings.Contains(data, "name="):
 			// Valido si el parametro ya fue ingresado
 			if band_name {
-				Salida_comando += "ERROR: El parametro -name ya fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -name ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -69,7 +68,7 @@ func Mount(commandArray []string) {
 			val_name = strings.Replace(val_data, "\"", "", 2)
 		/* PARAMETRO NO VALIDO */
 		default:
-			Salida_comando += "ERROR: Parametro no valido" + "\n"
+			fmt.Println("Invalido: El parametro " + data + " no es valido")
 		}
 	}
 
@@ -125,16 +124,14 @@ func Mount(commandArray []string) {
 						//guardar particion montada
 						ParticionesMontadas = append(ParticionesMontadas, ParticionMontada{id, val_path, val_name, letra, num, 1})
 						Salida_comando += "Particion ya montada " + "\n"
-						//imprimir particiones montadas
+						//concatenar el recorrido de las particiones montadas
 						for i := 0; i < len(ParticionesMontadas); i++ {
-							if ParticionesMontadas[i].Direccion != "" {
-								Salida_comando += fmt.Sprint(ParticionesMontadas[i]) + "\n"
-							}
+							Salida_comando += "ID: " + ParticionesMontadas[i].id + " Direccion: " + ParticionesMontadas[i].Direccion + " Nombre: " + ParticionesMontadas[i].Nombre + " Letra: " + ParticionesMontadas[i].Letra + " Numero: " + strconv.Itoa(ParticionesMontadas[i].Num) + " Estado: " + strconv.Itoa(ParticionesMontadas[i].Estado) + "\n"
 						}
 					}
 
 				} else {
-					Salida_comando += "[Error] no se encuentra el disco" + "\n"
+					fmt.Println("Invalido: No se encuentra el disco")
 				}
 			} else {
 				// Buscar en las particiones logicas
@@ -179,24 +176,22 @@ func Mount(commandArray []string) {
 							//guardar particion montada
 							ParticionesMontadas[num] = ParticionMontada{id, val_path, val_name, letra, num, 1}
 							Salida_comando += "Particion logica montada con exito" + "\n"
-							//imprimir particiones montadas
+							//concatenar el recorrido de las particiones montadas
 							for i := 0; i < len(ParticionesMontadas); i++ {
-								if ParticionesMontadas[i].Direccion != "" {
-									Salida_comando += fmt.Sprint(ParticionesMontadas[i]) + "\n"
-								}
+								Salida_comando += "ID: " + ParticionesMontadas[i].id + " Direccion: " + ParticionesMontadas[i].Direccion + " Nombre: " + ParticionesMontadas[i].Nombre + " Letra: " + ParticionesMontadas[i].Letra + " Numero: " + strconv.Itoa(ParticionesMontadas[i].Num) + " Estado: " + strconv.Itoa(ParticionesMontadas[i].Estado) + "\n"
 							}
 						}
 
 					} else {
-						Salida_comando += "[Error] no se encuentra el disco" + "\n"
+						fmt.Println("Invalido: No se encuentra el disco")
 					}
 				} else {
-					Salida_comando += "No se encuentra la particion a montar" + "\n"
+					fmt.Println("Invalido: No se encuentra la particion")
 				}
 			}
 
 		} else {
-			Salida_comando += "ERROR: Faltan parametros obligatorios" + "\n"
+			fmt.Println("Invalido: El comando MOUNT requiere los parametros obligatorios [-path] y [-name]")
 		}
 	}
 	Salida_comando += "MENSAJE: El comando MOUNT aqui termina" + "\n"

@@ -43,7 +43,7 @@ func Rep(commandArray []string) {
 		case strings.Contains(data, "name="):
 			// Valido si el parametro ya fue ingresado
 			if band_name {
-				Salida_comando += "ERROR: El parametro -name ya fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -name ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -56,7 +56,7 @@ func Rep(commandArray []string) {
 		/* PARAMETRO OBLIGATORIO -> PATH */
 		case strings.Contains(data, "path="):
 			if band_path {
-				Salida_comando += "ERROR: El parametro -path ya fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -path ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -70,7 +70,7 @@ func Rep(commandArray []string) {
 		case strings.Contains(data, "id="):
 			// Valido si el parametro ya fue ingresado
 			if band_id {
-				Salida_comando += "ERROR: El parametro -id ya fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -id ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -83,7 +83,7 @@ func Rep(commandArray []string) {
 		/* PARAMETRO OBLIGATORIO -> RUTA */
 		case strings.Contains(data, "ruta="):
 			if band_ruta {
-				Salida_comando += "ERROR: El parametro -ruta ya fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -ruta ya fue ingresado...")
 				band_error = true
 				break
 			}
@@ -92,7 +92,7 @@ func Rep(commandArray []string) {
 			band_ruta = true
 		/* PARAMETRO NO VALIDO */
 		default:
-			Salida_comando += "ERROR: Parametro no valido..." + "\n"
+			fmt.Println("Invalido: El parametro " + data + " no es valido")
 		}
 	}
 
@@ -114,16 +114,16 @@ func Rep(commandArray []string) {
 							graficar_disk(aux.Direccion, val_path)
 						}
 					} else {
-						Salida_comando += "ERROR: No se encontro la particion montada con el id: " + val_id + "\n"
+						fmt.Println("Invalido: No se encontro la particion montada con el id:", val_id)
 					}
 				} else {
-					Salida_comando += "ERROR: El parametro -id no fue ingresado..." + "\n"
+					fmt.Println("Invalido: El parametro -id no fue ingresado...")
 				}
 			} else {
-				Salida_comando += "ERROR: El parametro -name no fue ingresado..." + "\n"
+				fmt.Println("Invalido: El parametro -name no fue ingresado...")
 			}
 		} else {
-			Salida_comando += "ERROR: El parametro -path no fue ingresado..." + "\n"
+			fmt.Println("Invalido: El parametro -path no fue ingresado...")
 		}
 	}
 	Salida_comando += "MENSAJE: El comando REP aqui finaliza" + "\n"
@@ -493,14 +493,13 @@ func graficar_disk(direccion string, destino string) {
 			// Ejecutar el comando para generar la imagen
 			cmd := exec.Command("dot", "-Tpng", "reporte.dot", "-o", destino)
 			if err := cmd.Run(); err != nil {
-				Salida_comando += "ERROR: Error al generar la imagen..." + "\n"
 				fmt.Println("[ERROR] Error al generar la imagen:", err)
 				return
 			}
 		} else {
-			Salida_comando += "ERROR: El disco no fue encontrado..." + "\n"
+			fmt.Println("[Invalido] Error al abrir el archivo:", err)
 		}
 	} else {
-		Salida_comando += "ERROR: Disco vacio..." + "\n"
+		fmt.Println("[Invalido] El disco no fue encontrado...")
 	}
 }

@@ -3,6 +3,7 @@ package Comandos
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -51,11 +52,11 @@ func bytes_a_struct_ebr(s []byte) Ebr {
 
 // Muestra el mensaje de error
 func MsgError(err error) {
-	Salida_comando = "ERROR: " + err.Error()
+	fmt.Println("ERROR: ", err)
 }
 
 func Error(op string, mensaje string) {
-	Salida_comando = "ERROR: " + op + "\nTIPO: " + mensaje
+	fmt.Println("ERROR: ", op, mensaje)
 }
 
 func Comparar(a string, b string) bool {

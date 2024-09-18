@@ -11,6 +11,6 @@ export class ApiService {
   ) { }
 
   postEntrada(entrada: string) {
-    return this.httpClient.post("http://localhost:5000/analizar", { Cmd: entrada });
+    return this.httpClient.post("http://localhost:5000/analizar", { Cmd: entrada }, { responseType: 'text' });
   }
 }
