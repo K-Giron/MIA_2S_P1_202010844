@@ -1,11 +1,14 @@
 package Comandos
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
 	"strings"
+	"unsafe"
 )
 
 // Arreglo para guardar las particiones montadas
@@ -355,56 +358,57 @@ func buscar_particion_l(direccion string, nombre string) int {
 	return -1
 }
 
-/*
-func GetMount(op string, id string, p *string) Partition {
+func GetMount(comando string, id string, p *string) Partition {
+	//verificar que los dos primeros caracteres del id sean 4 y 4 sino exit
 	if !(id[0] == '4' && id[1] == '4') {
-		Error(op, "El primer identificador no es válido.")
+		Error(comando, "El primer identificador no es válido.")
 		return Partition{}
 	}
-	//letra := id[len(id)-1]
+	//obtener la letra del disco
+	letra := id[len(id)-1]
 	id = strings.ReplaceAll(id, "44", "")
 	i, _ := strconv.Atoi(string(id[0] - 1))
+	//imprimir el resultado
+	Salida_comando += "desde get Mount ->ID: " + id + " Letra: " + string(letra) + "\n"
+	//si el primer identificador es menor a 0, exit
 	if i < 0 {
-		Error(op, "El primer identificador no es válido.")
+		Error(comando, "El primer identificador no es válido.")
 		return Partition{}
 	}
-	for j := 10; j < 26; j++ {
-		if ParticionesMontadas[i].Estado == 1 {
-			//comparar letra
-			if ParticionesMontadas[i].Letra == string(rune(j)) {
+	//recorrer el arreglo de particiones montadas
+	for _, pm := range ParticionesMontadas {
+		//verificar que el estado sea 1
+		if pm.Estado == 1 {
+			//verficar que la letra sea igual a la letra del disco
+			if pm.Letra == string(letra) {
 
-				path := ""
-				for k := 0; k < len(ParticionesMontadas[i].Direccion); k++ {
-					if ParticionesMontadas[i].Direccion[k] != 0 {
-						path += string(ParticionesMontadas[i].Direccion[k])
-					}
-				}
+				//obtener la direccion de la particion montada
+				path := pm.Direccion
+				//abrir el archivo
+				file, err := os.Open(strings.ReplaceAll(path, "\"", ""))
 
-				file, error := os.Open(strings.ReplaceAll(path, "\"", ""))
-				if error != nil {
-					Error(op, "Error al abrir el archivo")
+				if err != nil {
+					Error(comando, "No se pudo abrir el disco.")
 					return Partition{}
 				}
-				disk := NewMbr()
+				//crear instancia de mbr
+				disk := NewMBR()
+				//Posicionarse al inicio del archivo
 				file.Seek(0, 0)
-
-				data := make([]byte, int(unsafe.Sizeof(disk)))
+				data := LeerBytes(file, int(unsafe.Sizeof(Mbr{})))
 				buffer := bytes.NewBuffer(data)
+				//decodificar el mbr
 				err_ := binary.Read(buffer, binary.BigEndian, &disk)
-
 				if err_ != nil {
-					Error("FDSIK", "Error al leer el archivo")
+					Error(comando, "No se pudo leer el disco.")
 					return Partition{}
 				}
 				file.Close()
 
-				nombreParticion := ""
-				for k := 0; k < len(ParticionesMontadas[i].Nombre); k++ {
-					if ParticionesMontadas[i].Nombre[k] != 0 {
-						nombreParticion += string(ParticionesMontadas[i].Nombre[k])
-					}
-				}
+				nombreParticion := pm.Nombre
+
 				*p = path
+				//devolver la particion
 				return *BuscarParticiones(disk, nombreParticion, path)
 
 			}
@@ -412,4 +416,3 @@ func GetMount(op string, id string, p *string) Partition {
 	}
 	return Partition{}
 }
-*/

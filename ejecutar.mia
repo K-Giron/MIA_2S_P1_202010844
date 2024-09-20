@@ -6,6 +6,7 @@ fdisk -Size=1 -unit=M -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=P
 fdisk -Size=2 -unit=M -path="C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia" -name=Particion4
 mount -path=C:\Users\kevin\Desktop\P1_MIA\Discos\A.mia -name=Particion1
 rep -id=441A -Path=C:\Users\kevin\Desktop\P1_MIA\Reportes\Disk.jpg -name=disk
+mkfs -type=full -id=341A
 
 #para linux
 rmdisk -path=/home/kevin/Escritorio/archivos/MIA_2S_P1_202010844/Discos/A.mia

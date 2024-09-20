@@ -1,12 +1,14 @@
 package Comandos
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
 	"strings"
+	"unsafe"
 )
 
 // estructura ---------------------------------------
@@ -17,6 +19,18 @@ type Ebr = struct {
 	Part_size   [100]byte
 	Part_next   [100]byte
 	Part_name   [100]byte
+}
+
+func NewEBR() Ebr {
+	var ebr Ebr
+	//inicializa los valores de la particion extendida con valores por defecto
+	copy(ebr.Part_status[:], "0")
+	copy(ebr.Part_fit[:], "WF")
+	copy(ebr.Part_start[:], "-1")
+	copy(ebr.Part_size[:], "0")
+	copy(ebr.Part_next[:], "-1")
+	copy(ebr.Part_name[:], "")
+	return ebr
 }
 
 /* FDISK */
@@ -1464,61 +1478,70 @@ func existe_particion(direccion string, nombre string) bool {
 	return false
 }
 
-/*
-func newParticion() *Partition {
-	return &Partition{
-		Part_status: '0',
-		Part_type:   'P',
-		Part_fit:    'F',
-		Part_start:  -1,
-		Part_size:   0,
-		Part_name:   [16]byte{},
-	}
-}
-
 func BuscarParticiones(mbr Mbr, name string, path string) *Partition {
-	particiones := mbr.Mbr_partition
+
+	var particiones [4]Partition
+	particiones[0] = mbr.Mbr_partition[0]
+	particiones[1] = mbr.Mbr_partition[1]
+	particiones[2] = mbr.Mbr_partition[2]
+	particiones[3] = mbr.Mbr_partition[3]
 
 	ext := false
-	extended := newParticion()
-	for i := 0; i < len(particiones); i++ {
+	extended := newPARTITION()
+	//Recorrer el arreglo de particiones en el for
+	for i := 0; i < 4; i++ {
 		particion := particiones[i]
-		if strings.TrimSpace(string(particion.Part_name[:])) != "" {
+		//verificar si el status es 1
+		//imprimir el valor del estatus en la particion
+		if string(particion.Part_status[:1]) == "1" {
+			fmt.Println("Particion Activa con 1.1")
+		}
+		if string(particion.Part_status[:1]) == "2" {
+			fmt.Println("Particion Activa con 2.1")
 			nombre := ""
-			for j := 0; j < len(particion.Part_name); j++ {
-				if particion.Part_name[j] != 0 {
-					nombre += string(particion.Part_name[j])
+			//obtener el nombre de la particion
+			for _, v := range particiones[i].Part_name {
+				if v != 0 {
+					nombre += string(v)
 				}
 			}
-			if Comparar(nombre, name) {
-				return &particion
-			} else if strings.TrimSpace(string(particion.Part_type[:])) == "E" || strings.TrimSpace(string(particion.Part_type[:])) == "e" {
+
+			//verificar si el nombre de la particion es igual al nombre que se busca
+			if nombre == name {
+				//si es igual retornar la particion
+				return &particiones[i]
+			} else if string(particiones[i].Part_type[:1]) == "E" || string(particiones[i].Part_type[:1]) == "e" {
 				ext = true
-				extended = &particion
+				extended = particion
 			}
 
 		}
+
 	}
 
 	if ext {
+		//		ebrs := GetLogicas(extended,path)
 		ebrs := GetLogicas(extended, path)
 		for i := 0; i < len(ebrs); i++ {
 			ebr := ebrs[i]
-			if ebr.Part_status == '1' {
+			if string(ebr.Part_status[:1]) == "1" {
+				fmt.Println("Particion Activa con 1")
+			}
+			if string(ebr.Part_status[:1]) == "2" {
+				fmt.Println("Particion Activa con 2")
 				nombre := ""
-				for j := 0; j < len(ebr.Part_name); j++ {
-					if ebr.Part_name[j] != 0 {
-						nombre += string(ebr.Part_name[j])
+				for _, v := range ebr.Part_name {
+					if v != 0 {
+						nombre += string(v)
 					}
 				}
-				if Comparar(nombre, name) {
-					tmp := Structs.NewParticion()
-					tmp.Part_status = '1'
-					tmp.Part_type = 'L'
-					tmp.Part_fit = ebr.Part_fit
-					tmp.Part_start = ebr.Part_start
-					tmp.Part_size = ebr.Part_size
+				if nombre == name {
+					tmp := newPARTITION()
+					copy(tmp.Part_fit[:], ebr.Part_fit[:])
 					copy(tmp.Part_name[:], ebr.Part_name[:])
+					copy(tmp.Part_size[:], ebr.Part_size[:])
+					copy(tmp.Part_start[:], ebr.Part_start[:])
+					copy(tmp.Part_status[:], ebr.Part_status[:])
 					return &tmp
 				}
 			}
@@ -1526,4 +1549,68 @@ func BuscarParticiones(mbr Mbr, name string, path string) *Partition {
 	}
 	return nil
 }
-*/
+
+func GetLogicas(particion Partition, path string) []Ebr {
+	var ebrs []Ebr
+
+	//abrir el archivo
+	file, err := os.Open(strings.ReplaceAll(path, "\"", ""))
+	if err != nil {
+		fmt.Println("Error al abrir el archivo")
+		return nil
+	}
+	//posicionarse en el inicio del archivo
+	file.Seek(0, 0)
+	tmp := NewEBR()
+	// Convertir el array de bytes a una cadena, eliminar caracteres nulos y convertir a int64
+	partStartStr := strings.Trim(string(particion.Part_start[:]), "\x00")
+	partStartInt, err := strconv.ParseInt(partStartStr, 10, 64)
+	if err != nil {
+		fmt.Println("Error al convertir Part_start a int64")
+		return nil
+	}
+
+	// Posicionarse en el inicio de la particion extendida
+	file.Seek(partStartInt, 0)
+
+	//leer el ebr
+	data := LeerBytes(file, int(unsafe.Sizeof(Ebr{})))
+	buffer := bytes.NewBuffer(data)
+	err = binary.Read(buffer, binary.BigEndian, &tmp)
+	if err != nil {
+		fmt.Println("Error al leer el archivo")
+		return nil
+	}
+	//for sin condiciones para recorrer todas las particiones y break para salir del ciclo
+	for {
+		//verificar que el status sea diferente de 0 y el next sea diferente de -1
+		if string(tmp.Part_status[:1]) != "0" && string(tmp.Part_next[:1]) != "-1" {
+			//agregar el ebr al arreglo
+			ebrs = append(ebrs, tmp)
+			// Convertir el array de bytes a una cadena, eliminar caracteres nulos y convertir a int64
+			partNextStr := strings.Trim(string(tmp.Part_next[:]), "\x00")
+			partNextInt, err := strconv.ParseInt(partNextStr, 10, 64)
+			if err != nil {
+				fmt.Println("Error al convertir Part_next a int64")
+				return nil
+			}
+
+			// Posicionarse en el siguiente EBR
+			file.Seek(partNextInt, 0)
+			//leer el ebr
+			data = LeerBytes(file, int(unsafe.Sizeof(Ebr{})))
+			buffer = bytes.NewBuffer(data)
+			err = binary.Read(buffer, binary.BigEndian, &tmp)
+			if err != nil {
+				fmt.Println("Error al leer el archivo")
+				return nil
+			}
+		} else {
+			file.Close()
+			break
+		}
+
+	}
+
+	return ebrs
+}

@@ -5,6 +5,8 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
+	"log"
+	"os"
 	"strings"
 )
 
@@ -20,6 +22,23 @@ func struct_a_bytes(p interface{}) []byte {
 	}
 
 	return buf.Bytes()
+}
+
+func LeerBytes(file *os.File, number int) []byte {
+	bytes := make([]byte, number)
+	_, err := file.Read(bytes)
+	if err != nil {
+		MsgError(err)
+	}
+	return bytes
+}
+
+func EscribirBytes(file *os.File, bytes []byte) {
+	_, err := file.Write(bytes)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // Decodifica de [] Bytes a Struct

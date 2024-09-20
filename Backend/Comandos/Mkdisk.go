@@ -23,6 +23,11 @@ type Mbr = struct {
 	Mbr_partition      [4]Partition
 }
 
+func NewMBR() Mbr {
+	var mbr Mbr
+	return mbr
+}
+
 type Partition = struct {
 	Part_status      [100]byte
 	Part_type        [100]byte
@@ -37,6 +42,20 @@ type Partition = struct {
 func NewMbr() Mbr {
 	var mbr Mbr
 	return mbr
+}
+
+func newPARTITION() Partition {
+	var Part Partition
+	//devuelve una particion con valores por defecto
+	copy(Part.Part_status[:], "0")
+	copy(Part.Part_type[:], "P")
+	copy(Part.Part_fit[:], "WF")
+	copy(Part.Part_start[:], "-1")
+	copy(Part.Part_size[:], "0")
+	copy(Part.Part_name[:], "")
+	copy(Part.Part_correlative[:], "0")
+	copy(Part.Part_id[:], "0")
+	return Part
 }
 
 /* MKDISK */
